@@ -1,19 +1,16 @@
-import           Data.List
+import qualified Data.Set           as S
 import           Data.String
 import           Prelude
 import           System.Environment
 import           System.IO
 
-groupAnswers :: [String] -> [String] -> [[String]]
-groupAnswers grouped (str:strs) | null strs = [str : grouped]
-                                | null str  = grouped : groupAnswers [] strs
-                                | otherwise = groupAnswers (str : grouped) strs
-
-countGroupYes :: [String] -> Int
-countGroupYes = length . nub . concat
+grpAns :: S.Set Char -> [S.Set Char] -> [S.Set Char]
+grpAns gpd (ans:anss) | null anss  = [S.union gpd ans]
+                      | S.null ans = gpd : grpAns S.empty anss
+                      | otherwise  = grpAns (S.union gpd ans) anss
 
 solve :: String -> Int
-solve = sum . map countGroupYes . groupAnswers [] . lines
+solve = sum . map S.size . grpAns S.empty . map S.fromList . lines
 
 main :: IO ()
 main = do args <- getArgs

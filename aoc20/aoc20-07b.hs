@@ -4,35 +4,29 @@ import           Prelude
 import           System.Environment
 import           System.IO
 
-data Tree a = Node a [Tree a]
-type Rule = (String, [(String, Int)])
+type Bag = String
+type Rule = (Bag, [(Bag, Int)])
+
+getWords :: String -> [String]
+getWords = map (filter isAlphaNum) . words
 
 getRule :: String -> Rule
 getRule str = (outBag, inBags)
-    where getWords = map (filter isAlphaNum) . words
-          outBag = concatWords . take 2 . getWords $ str
+    where outBag = concat . take 2 . getWords $ str
           inBags = f . drop 4 . getWords $ str
           f [] = []
-          f (str:strs) | str == "no" = f (drop 3 strs)
-                       | otherwise   = (concatWords $ take 2 strs, read str) : f (drop 3 strs)
+          f (str:strs) | str == "no" = []
+                       | otherwise   = (concat $ take 2 strs, read str) : f (drop 3 strs)
 
-concatWords :: [String] -> String
-concatWords []         = ""
-concatWords (str:strs) | not (null strs) = str ++ ' ' : concatWords strs
-                       | otherwise       = str
+containsDir :: Bag -> [Rule] -> [(Bag, Int)]
+containsDir bag rules = snd . head . filter (\r -> fst r == bag) $ rules
 
-contains :: [Rule] -> String -> [(String, Int)]
-contains rules bag = snd . head . filter (\r -> fst r == bag) $ rules
-
-treeFromNBags :: String -> Int -> [Rule] -> Tree Int
-treeFromNBags bag n rules = Node n (map (\(bag', m) -> treeFromNBags bag' m rules)
-                                   $ contains rules bag)
-
-countBags :: Tree Int -> Int
-countBags (Node n subtrees) = n + n * sum (map countBags subtrees)
+countBags :: Int -> Bag -> [Rule] -> Int
+countBags n bag rules = n + n * sum (map f $ containsDir bag rules)
+    where f = \(bag',m) -> countBags m bag' rules
 
 solve :: String -> Int
-solve = subtract 1 . countBags . treeFromNBags "shiny gold" 1 . map getRule . lines
+solve = subtract 1 . countBags 1 "shinygold" . map getRule . lines
 
 main :: IO ()
 main = do args <- getArgs

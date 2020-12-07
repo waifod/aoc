@@ -1,23 +1,19 @@
-import           Data.List
+import qualified Data.Set           as S
 import           Data.String
 import           Prelude
 import           System.Environment
 import           System.IO
 
-groupAnswers :: [String] -> [String] -> [[String]]
-groupAnswers grouped (str:strs) | null strs = [str : grouped]
-                                | null str  = grouped : groupAnswers [] strs
-                                | otherwise = groupAnswers (str : grouped) strs
-
-allYes :: Char -> [String] -> Bool
-allYes c = and . map (elem c)
-
-countAllYes :: [String] -> Int
-countAllYes strs = length $ filter (\f -> f strs) checkYes
-    where checkYes = [allYes c | c <- ['a'..'z']]
+grpAns :: [S.Set Char] -> [[S.Set Char]]
+grpAns [] = []
+grpAns (ans:anss) | null ans = grpAns anss
+                  | otherwise = f [ans] anss
+    where f gpd [] = [gpd]
+          f gpd (ans:anss) | null ans  = gpd : grpAns anss
+                           | otherwise = f (ans : gpd) anss
 
 solve :: String -> Int
-solve = sum . map countAllYes . groupAnswers [] . lines
+solve = sum . map (S.size . foldl1 S.intersection) . grpAns . map S.fromList . lines
 
 main :: IO ()
 main = do args <- getArgs
