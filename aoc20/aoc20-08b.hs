@@ -4,43 +4,39 @@ import           Prelude
 import           System.Environment
 import           System.IO
 
-data Op = Acc Char Int | Jmp Char Int | NOp Char Int
+data Op = Acc Int | Jmp Int | NOp Int
 
-storeIns :: [String] -> [Op]
-storeIns [] = []
-storeIns (ins:inss) = case take 3 ins of
-                          "acc" -> Acc sign num : storeIns inss
-                          "jmp" -> Jmp sign num : storeIns inss
-                          "nop" -> NOp sign num : storeIns inss
-    where sign = head $ drop 4 ins
-          num  = read $ drop 5 ins
+storeOps :: [String] -> [Op]
+storeOps [] = []
+storeOps (ins:n:strs) = case ins of
+                            "acc" -> Acc num : storeOps strs
+                            "jmp" -> Jmp num : storeOps strs
+                            "nop" -> NOp num : storeOps strs
+    where num  = read $ if head n == '+' then tail n else n
 
 process :: Int -> Int -> [Op] -> Int
-process acc n inss | n == length inss = acc
-                   | otherwise        = case inss !! n of
-                                            Acc '+' k -> process (acc + k) (n + 1) inss
-                                            Acc '-' k -> process (acc - k) (n + 1) inss
-                                            Jmp '+' k -> process acc (n + k) inss
-                                            Jmp '-' k -> process acc (n - k) inss
-                                            NOp c   k -> process acc (n + 1) inss
+process acc n ops | n == length ops = acc
+                  | otherwise        = case ops !! n of
+                                           Acc k -> process (acc + k) (n + 1) ops
+                                           Jmp k -> process acc (n + k) ops
+                                           NOp k -> process acc (n + 1) ops
 
 terminates :: Int -> [Int] -> [Op] -> Bool
-terminates n done inss | n == length inss = True
-                       | n `elem` done    = False
-                       | otherwise        = case inss !! n of
-                                                Jmp '+' k -> terminates (n + k) (n : done) inss
-                                                Jmp '-' k -> terminates (n - k) (n : done) inss
-                                                _         -> terminates (n + 1) (n : done) inss
+terminates n done ops | n == length ops = True
+                      | n `elem` done   = False
+                      | otherwise       = case ops !! n of
+                                              Jmp k -> terminates (n + k) (n : done) ops
+                                              _     -> terminates (n + 1) (n : done) ops
 
 altOps :: [Op] -> [[Op]]
 altOps [] = []
-altOps (ins:inss) = case ins of
-                        Jmp sign num -> (NOp sign num : inss) : map (ins :) (altOps inss)
-                        NOp sign num -> (Jmp sign num : inss) : map (ins :) (altOps inss)
-                        _            -> map (ins :) (altOps inss)
+altOps (op:ops) = case op of
+                      Jmp num -> (NOp num : ops) : map (op :) (altOps ops)
+                      NOp num -> (Jmp num : ops) : map (op :) (altOps ops)
+                      _       -> map (op :) (altOps ops)
 
 solve :: String -> Int
-solve = process 0 0 . head . filter (terminates 0 []) . altOps . storeIns . lines
+solve = process 0 0 . head . filter (terminates 0 []) . altOps . storeOps . words
 
 main :: IO ()
 main = do args <- getArgs

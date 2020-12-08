@@ -1,31 +1,29 @@
 import           Data.Char
+import           Data.List
 import           Data.String
 import           Prelude
 import           System.Environment
 import           System.IO
 
-data Op = Acc Char Int | Jmp Char Int | NOp Char Int
+data Op = Acc Int | Jmp Int | NOp Int
 
-storeIns :: [String] -> [Op]
-storeIns [] = []
-storeIns (ins:inss) = case take 3 ins of
-                          "acc" -> Acc sign num : storeIns inss
-                          "jmp" -> Jmp sign num : storeIns inss
-                          "nop" -> NOp sign num : storeIns inss
-    where sign = head $ drop 4 ins
-          num  = read $ drop 5 ins
+storeOps :: [String] -> [Op]
+storeOps [] = []
+storeOps (ins:n:strs) = case ins of
+                            "acc" -> Acc num : storeOps strs
+                            "jmp" -> Jmp num : storeOps strs
+                            "nop" -> NOp num : storeOps strs
+    where num  = read $ if head n == '+' then tail n else n
 
 process :: Int -> Int -> [Int] -> [Op] -> Int
-process acc n done inss | n `elem` done = acc
-                        | otherwise     = case inss !! n of
-                                              Acc '+' k -> process (acc + k) (n + 1) (n : done) inss
-                                              Acc '-' k -> process (acc - k) (n + 1) (n : done) inss
-                                              Jmp '+' k -> process acc (n + k) (n : done) inss
-                                              Jmp '-' k -> process acc (n - k) (n : done) inss
-                                              NOp c   k -> process acc (n + 1) (n : done) inss
+process acc n done ops | n `elem` done = acc
+                       | otherwise     = case ops !! n of
+                                             Acc k -> process (acc + k) (n + 1) (n : done) ops
+                                             Jmp k -> process acc (n + k) (n : done) ops
+                                             NOp k -> process acc (n + 1) (n : done) ops
 
 solve :: String -> Int
-solve = process 0 0 [] . storeIns . lines
+solve = process 0 0 [] . storeOps . words
 
 main :: IO ()
 main = do args <- getArgs
