@@ -14,7 +14,7 @@ nTrees = length . filter (=='#')
 
 solve :: String -> Int
 solve str = product $ map (\f -> nTrees $ f 0 grid) slopes
-    where grid  = lines str
+    where grid   = lines str
           slopes = [path 3 1]
 
 main = do args <- getArgs
