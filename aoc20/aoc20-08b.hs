@@ -1,9 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 import qualified Data.Array         as A
-import           Data.Char
 import qualified Data.IntSet        as S
 import           Data.String
-import           Prelude
 import           System.Environment
 import           System.IO
 
@@ -24,9 +22,10 @@ storeOps (ins:n:strs) = case ins of
     where m  = read $ if head n == '+' then tail n else n
 
 eval' :: VMState -> Maybe Int
-eval' c@VMState{..} | S.member cursor done        = Nothing
-                    | cursor > snd (A.bounds ops) = Just acc
-                    | otherwise                   = exec
+eval' c@VMState{..}
+    | S.member cursor done        = Nothing
+    | cursor > snd (A.bounds ops) = Just acc
+    | otherwise                   = exec
     where exec = case ops A.! cursor of
                      Acc k -> eval' c{ acc = acc + k
                                      , cursor = cursor + 1

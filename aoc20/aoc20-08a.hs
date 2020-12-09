@@ -1,9 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 import qualified Data.Array         as A
-import           Data.Char
 import qualified Data.IntSet        as S
 import           Data.String
-import           Prelude
 import           System.Environment
 import           System.IO
 

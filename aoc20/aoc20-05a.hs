@@ -1,13 +1,13 @@
 import           Data.String
-import           Prelude
 import           System.Environment
 import           System.IO
 
 str2int :: String -> Int
 str2int xs = f 0 xs
     where f n [] = n
-          f n (x:xs) | x == 'B' || x == 'R' = f (2 * n + 1) xs
-                     | otherwise            = f (2 * n) xs
+          f n (x:xs)
+              | x == 'B' || x == 'R' = f (2 * n + 1) xs
+              | otherwise            = f (2 * n) xs
 
 seatID :: String -> Int
 seatID str = 8 * row + col

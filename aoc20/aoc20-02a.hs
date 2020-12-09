@@ -1,13 +1,13 @@
 import           Data.Char
 import           Data.String
-import           Prelude
 import           System.Environment
 import           System.IO
 
 dropUntil :: (a -> Bool) -> [a] -> [a]
 dropUntil _ [] = []
-dropUntil p (x:xs) | p x       = xs
-                   | otherwise = dropUntil p xs
+dropUntil p (x:xs)
+    | p x       = xs
+    | otherwise = dropUntil p xs
 
 splitStr :: String -> [String]
 splitStr [] = []

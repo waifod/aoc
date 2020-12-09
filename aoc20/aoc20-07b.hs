@@ -1,6 +1,5 @@
 import           Data.Char
 import           Data.String
-import           Prelude
 import           System.Environment
 import           System.IO
 
@@ -15,8 +14,9 @@ getRule str = (outBag, inBags)
     where outBag = concat . take 2 . getWords $ str
           inBags = f . drop 4 . getWords $ str
           f [] = []
-          f (str:strs) | str == "no" = []
-                       | otherwise   = (concat $ take 2 strs, read str) : f (drop 3 strs)
+          f (str:strs)
+              | str == "no" = []
+              | otherwise   = (concat $ take 2 strs, read str) : f (drop 3 strs)
 
 containsDir :: Bag -> [Rule] -> [(Bag, Int)]
 containsDir bag rules = snd . head . filter (\r -> fst r == bag) $ rules
