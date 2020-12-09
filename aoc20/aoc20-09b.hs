@@ -23,10 +23,11 @@ firstNotValid ints = g batch ns
 contSublist :: [Int] -> [Int]
 contSublist ns = g [] ns
     where k = firstNotValid ns
-          g cnt ints@(n:ns) | sum cnt + n < k = g (n : cnt) ns
-                            | n == k          = g [] ns
-                            | sum cnt + n > k = g (init cnt) ints
-                            | otherwise       = n : cnt
+          g cnt ints@(n:ns)
+              | sum cnt + n < k = g (n : cnt) ns
+              | n == k          = g [] ns
+              | sum cnt + n > k = g (init cnt) ints
+              | otherwise       = n : cnt
 
 solve :: String -> Int
 solve = diff . contSublist . map read . lines
