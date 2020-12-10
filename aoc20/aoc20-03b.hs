@@ -12,7 +12,7 @@ path h v p xs
     | length xs <= v = []
     | otherwise      = (xs !! v !! newP) : path h v newP (drop v xs)
     where len  = length $ head xs
-          newP = p + h `rem` len
+          newP = (p + h) `rem` len
 
 nTrees :: String -> Int
 nTrees = length . filter (=='#')
