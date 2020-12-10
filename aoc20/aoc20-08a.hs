@@ -1,9 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 import qualified Data.Array         as A
 import qualified Data.IntSet        as S
-import           Data.String
 import           System.Environment
-import           System.IO
 
 data Op = Acc Int | Jmp Int | NOp Int
 

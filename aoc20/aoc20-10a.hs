@@ -1,6 +1,4 @@
-import qualified Data.IntSet        as S
 import           Data.List
-import           Data.String
 import           System.Environment
 
 result :: [Int] -> Int

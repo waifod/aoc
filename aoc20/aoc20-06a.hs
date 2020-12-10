@@ -1,7 +1,5 @@
 import qualified Data.Set           as S
-import           Data.String
 import           System.Environment
-import           System.IO
 
 grpAns :: S.Set Char -> [S.Set Char] -> [S.Set Char]
 grpAns gpd (ans:anss)

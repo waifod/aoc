@@ -1,8 +1,6 @@
 import           Data.Char
 import qualified Data.Set           as S
-import           Data.String
 import           System.Environment
-import           System.IO
 
 type Bag = String
 type Rule = (Bag, [(Bag, Int)])

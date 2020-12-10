@@ -1,7 +1,5 @@
 import           Data.List
-import           Data.String
 import           System.Environment
-import           System.IO
 
 str2int :: String -> Int
 str2int xs = f 0 xs

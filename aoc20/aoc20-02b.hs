@@ -1,7 +1,5 @@
 import           Data.Char
-import           Data.String
 import           System.Environment
-import           System.IO
 
 xor :: Bool -> Bool -> Bool
 xor True  = not

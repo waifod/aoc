@@ -1,6 +1,4 @@
-import           Data.String
 import           System.Environment
-import           System.IO
 
 len :: Int
 len = 25
