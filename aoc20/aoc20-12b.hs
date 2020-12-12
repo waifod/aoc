@@ -18,12 +18,12 @@ rotate (x, y) l = case l of
 move :: (Pos, Pos) -> Ins -> (Pos, Pos)
 move ((x,y),(x',y')) (d,l) = case d of
                                  F -> ((x + l * x', y + l * y'), (x',y'))
-                                 R -> ((x,y), rotate (x',y') (360-l))
-                                 L -> ((x,y), rotate (x',y') l)
                                  N -> ((x,y), (x', y' + l))
                                  S -> ((x,y), (x', y' - l))
                                  E -> ((x,y), (x' + l, y'))
-                                 _ -> ((x,y), (x' - l, y'))
+                                 W -> ((x,y), (x' - l, y'))
+                                 R -> ((x,y), rotate (x',y') (360-l))
+                                 _ -> ((x,y), rotate (x',y') l)
 
 distance :: Pos -> Int
 distance ((x,y)) = abs x + abs y

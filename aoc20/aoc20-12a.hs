@@ -22,12 +22,11 @@ move ((x,y),d) (d',l) = case d' of
                                     S -> ((x, y - l), d)
                                     E -> ((x + l, y), d)
                                     W -> ((x - l, y), d)
-                           R -> ((x, y), rotate d (R, l))
-                           L -> ((x, y), rotate d (L, l))
                            N -> ((x, y + l), d)
                            S -> ((x, y - l), d)
                            E -> ((x + l, y), d)
-                           _ -> ((x - l, y), d)
+                           W -> ((x - l, y), d)
+                           _ -> ((x, y), rotate d (d', l))
 
 distance :: Pos -> Int
 distance (x,y) = abs x + abs y
