@@ -13,7 +13,7 @@ reducs :: [Int] -> Int
 reducs [_] = 1
 reducs [_,_] = 1
 reducs (n1:n2:n3:ns)
-    | n1 + 4 > n3 = product (map reducs $ split3 (n1:n3:ns)) + reducs (n2:n3:ns)
+    | n1 + 4 > n3 = reducs (n1:n3:ns) + reducs (n2:n3:ns)
     | otherwise   = reducs (n2:n3:ns)
 
 solve :: String -> Int
