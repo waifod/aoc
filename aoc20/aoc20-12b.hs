@@ -9,21 +9,19 @@ type Ins = (Dir, Int)
 getIns :: String -> Ins
 getIns str = (read $ take 1 str, read $ tail str)
 
-rotate :: Pos -> Int -> Pos
-rotate (x, y) l = case l of
-                      90  -> (-y, x)
-                      180 -> (-x, -y)
-                      270 -> (y, -x)
+rotate :: Int -> Pos -> Pos
+rotate 90 (x,y) = (-y,x)
+rotate n (x,y)  = rotate (n - 90) (-y,x)
 
 move :: (Pos, Pos) -> Ins -> (Pos, Pos)
-move ((x,y),(x',y')) (d,l) = case d of
-                                 F -> ((x + l * x', y + l * y'), (x',y'))
-                                 N -> ((x,y), (x', y' + l))
-                                 S -> ((x,y), (x', y' - l))
-                                 E -> ((x,y), (x' + l, y'))
-                                 W -> ((x,y), (x' - l, y'))
-                                 R -> ((x,y), rotate (x',y') (360-l))
-                                 _ -> ((x,y), rotate (x',y') l)
+move ((x,y),(x',y')) (d,n) = case d of
+                                 F -> ((x + n * x', y + n * y'), (x',y'))
+                                 N -> ((x,y), (x', y' + n))
+                                 S -> ((x,y), (x', y' - n))
+                                 E -> ((x,y), (x' + n, y'))
+                                 W -> ((x,y), (x' - n, y'))
+                                 R -> ((x,y), rotate (360-n) (x',y'))
+                                 _ -> ((x,y), rotate n (x',y'))
 
 distance :: Pos -> Int
 distance ((x,y)) = abs x + abs y

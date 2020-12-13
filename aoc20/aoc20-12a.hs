@@ -10,23 +10,23 @@ getIns :: String -> Ins
 getIns str = (read $ take 1 str, read $ tail str)
 
 rotate :: Dir -> Ins -> Dir
-rotate d (d', l) = dirs !! ((j + i * (l `quot` 90)) `mod` 4)
+rotate d (d', n) = dirs !! ((j + i * (n `quot` 90)) `mod` 4)
     where dirs = [E,N,W,S]
           i = if d' == L then 1 else -1
           j = length $ takeWhile (/= d) dirs
 
 move :: (Pos, Dir) -> Ins -> (Pos, Dir)
-move ((x,y),d) (d',l) = case d' of
+move ((x,y),d) (d',n) = case d' of
                            F -> case d of
-                                    N -> ((x, y + l), d)
-                                    S -> ((x, y - l), d)
-                                    E -> ((x + l, y), d)
-                                    W -> ((x - l, y), d)
-                           N -> ((x, y + l), d)
-                           S -> ((x, y - l), d)
-                           E -> ((x + l, y), d)
-                           W -> ((x - l, y), d)
-                           _ -> ((x, y), rotate d (d', l))
+                                    N -> ((x, y + n), d)
+                                    S -> ((x, y - n), d)
+                                    E -> ((x + n, y), d)
+                                    W -> ((x - n, y), d)
+                           N -> ((x, y + n), d)
+                           S -> ((x, y - n), d)
+                           E -> ((x + n, y), d)
+                           W -> ((x - n, y), d)
+                           _ -> ((x, y), rotate d (d', n))
 
 distance :: Pos -> Int
 distance (x,y) = abs x + abs y
