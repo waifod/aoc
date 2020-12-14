@@ -1,35 +1,28 @@
+{-# LANGUAGE OverloadedStrings #-}
+import qualified Data.Text          as T
+import qualified Data.Text.IO       as T
 import           System.Environment
 
-dropUntil :: (a -> Bool) -> [a] -> [a]
-dropUntil _ [] = []
-dropUntil p (x:xs)
-    | p x       = xs
-    | otherwise = dropUntil p xs
+parse :: T.Text -> (String, [String])
+parse txt = (arr, ids)
+    where arr = T.unpack $ head $ T.lines txt
+          ids = filter notX $ map T.unpack $ T.splitOn "," $ T.lines txt !! 1
+          notX = \str -> str /= "x"
 
-getIds :: String -> [Int]
-getIds [] = []
-getIds str = map read $ f [] str
-    where f [] [] = []
-          f gpd [] = [reverse gpd]
-          f gpd (c:cs)
-              | c == 'x'              = f [] cs
-              | null gpd && c == ','  = f [] cs
-              | gpd /= [] && c == ',' = (reverse gpd) : f [] cs
-              | otherwise             = f (c : gpd) cs
+wait :: Int -> Int -> Int
+wait arr idBus = idBus - rem arr idBus
 
-earliest :: Int -> Int -> Int
-earliest arr idBus = (1 + quot (arr - 1) idBus) * idBus
+takeBusWait :: Int -> [Int] -> (Int, Int)
+takeBusWait arr = (\n -> (n, f n)) . foldl1 g
+    where f = wait arr
+          g = \n m -> if f n < f m then n else m
 
-takeBusAt :: Int -> [Int] -> (Int, Int)
-takeBusAt arr ids = (\n -> (n, f n)) $ foldl1 (\n m -> if f n < f m then n else m) ids
-    where f = earliest arr
-
-solve :: String -> Int
-solve str = (\(idBus, t) -> idBus * (t - arr)) $ takeBusAt arr ids
-    where arr = read $ takeWhile (/= '\n') str
-          ids = getIds $ dropUntil (== '\n') str
+solve :: T.Text -> Int
+solve txt = (\(idBus, t) -> idBus * t) $ takeBusWait arr ids
+    where arr = read $ fst $ parse txt
+          ids = map read $ snd $ parse txt
 
 main :: IO ()
 main = do args <- getArgs
-          content <- readFile (args !! 0)
+          content <- T.readFile (args !! 0)
           print $ solve content

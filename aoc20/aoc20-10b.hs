@@ -10,11 +10,10 @@ split3 = f []
               | otherwise        = (reverse grp) : f [n] ns
 
 reducs :: [Int] -> Int
-reducs [_] = 1
-reducs [_,_] = 1
 reducs (n1:n2:n3:ns)
-    | n1 + 4 > n3 = reducs (n1:n3:ns) + reducs (n2:n3:ns)
+    | n1 + 4 > n3 = reducs (n1:n3:ns) + reducs (n2:n3:ns) + 1
     | otherwise   = reducs (n2:n3:ns)
+reducs _ = 0
 
 solve :: String -> Int
 solve = product . map reducs . split3 . (0 :) . sort . map read . lines
