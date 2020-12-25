@@ -2,11 +2,8 @@ import           Data.List
 import           System.Environment
 
 result :: [Int] -> Int
-result = f 0 1
-    where f c1 c3 (n1:ns)
-              | null ns           = c1 * c3
-              | n1 + 1 == head ns = f (c1 + 1) c3 ns
-              | otherwise         = f c1 (c3 + 1) ns
+result ns = len1 * (len3 + 1)
+    where [len1, len3] = map length . group . sort $ zipWith (-) (tail ns) ns
 
 solve :: String -> Int
 solve = result . (0 :) . sort . map read . lines

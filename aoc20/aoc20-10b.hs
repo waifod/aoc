@@ -11,9 +11,9 @@ split3 = f []
 
 reducs :: [Int] -> Int
 reducs (n1:n2:n3:ns)
-    | n1 + 4 > n3 = reducs (n1:n3:ns) + reducs (n2:n3:ns) + 1
+    | n1 + 4 > n3 = reducs (n1:n3:ns) + reducs (n2:n3:ns)
     | otherwise   = reducs (n2:n3:ns)
-reducs _ = 0
+reducs _ = 1
 
 solve :: String -> Int
 solve = product . map reducs . split3 . (0 :) . sort . map read . lines

@@ -25,6 +25,7 @@ main = do
    let (x, y) =  passports $ T.pack content
    let (k, p) = partition (\x -> length x == 8) x
    print p
+   print $ length k + length (filter nocid p)
    print $ length (valid k) + length (valid (filter nocid p))
 
 checkbyr x = if findstr "byr:" x then check p else False
