@@ -23,6 +23,7 @@ coord (c1:c2:cs) = let (x, y) = coord cs in case [c1, c2] of
                                                 "sw" -> (x,   y-1)
                                                 "ne" -> (x,   y+1)
                                                 "nw" -> (x-1, y+1)
+
 flipTile :: Pos -> Grid -> Grid
 flipTile p grid
     | S.member p grid = S.delete p grid
