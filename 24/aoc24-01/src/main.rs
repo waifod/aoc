@@ -1,17 +1,10 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
+use utils;
 
-const FILE_PATH: &str = "./input-01.txt";
-
-fn read_lines(filename: impl AsRef<Path>) -> io::Lines<io::BufReader<File>> {
-    let file = File::open(filename).unwrap();
-    io::BufReader::new(file).lines()
-}
+const FILE_PATH: &str = "./input/input.txt";
 
 fn parse_input(file_path: &str) -> (Vec<i32>, Vec<i32>) {
-    read_lines(file_path).flatten().map(|line| {
+    utils::read_lines(file_path).flatten().map(|line| {
         let mut split_line = line.split_whitespace();
         (
             split_line.next().unwrap().parse::<i32>().unwrap(),
