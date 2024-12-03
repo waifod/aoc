@@ -1,8 +1,5 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
+use std::fs;
 
-pub fn read_lines(filename: impl AsRef<Path>) -> io::Lines<io::BufReader<File>> {
-    let file = File::open(filename).unwrap();
-    io::BufReader::new(file).lines()
+pub fn get_input(file_path: &str) -> String {
+    fs::read_to_string(file_path).unwrap()
 }
