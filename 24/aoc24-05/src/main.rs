@@ -1,69 +1,79 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use utils;
-
 const INPUT_PATH: &str = "./input/input.txt";
 
 fn parse_input(input: &str) -> (HashMap<i32, HashSet<i32>>, Vec<Vec<i32>>) {
-    let mut rules = HashMap::<i32,HashSet<i32>>::new();
+    let mut rules = HashMap::<i32, HashSet<i32>>::new();
     let mut updates = Vec::<Vec<i32>>::new();
-    let mut flag = true;
-    input.lines().for_each(|line|
-        if line == "" {
-            flag = false;
-        } else if flag  {
-            let mut it = line.split('|').map(|n| n.parse::<i32>().unwrap());
-            if let (Some(fst), Some(snd)) = (it.next(), it.next()) {
-                rules.entry(fst).or_insert(HashSet::<i32>::new()).insert(snd);
-            }
-        } else {
-            updates.push(line.split(',').map(|n| {
-                let num = n.parse::<i32>().unwrap();
-                rules.entry(num).or_insert(HashSet::<i32>::new());
-                num
-            }).collect());
+    let parts: Vec<&str> = input.split("\n\n").collect();
+
+    parts[0].lines().for_each(|line| {
+        let mut it = line.split('|').map(|n| n.parse::<i32>().unwrap());
+        if let (Some(fst), Some(snd)) = (it.next(), it.next()) {
+            rules.entry(fst).or_default().insert(snd);
         }
-    );
+    });
+
+    parts[1].lines().for_each(|line| {
+        updates.push(
+            line.split(',')
+                .map(|n| {
+                    let num = n.parse::<i32>().unwrap();
+                    rules.entry(num).or_default();
+                    num
+                })
+                .collect(),
+        );
+    });
+
     (rules, updates)
 }
 
 fn solve1(input: &(HashMap<i32, HashSet<i32>>, Vec<Vec<i32>>)) -> i32 {
     let (ref rules, ref updates) = input;
-    updates.iter()
+    updates
+        .iter()
         .filter_map(|u| {
             let mut n_so_far = HashSet::<i32>::new();
-            u.iter().all(|n| {
-                n_so_far.insert(*n);
-                rules.get(n).unwrap().intersection(&n_so_far).count() == 0
-            }).then_some(u[u.len()/2])
-        }).sum()
+            u.iter()
+                .all(|n| {
+                    n_so_far.insert(*n);
+                    rules.get(n).unwrap().intersection(&n_so_far).count() == 0
+                })
+                .then_some(u[u.len() / 2])
+        })
+        .sum()
 }
 
 fn solve2(input: &(HashMap<i32, HashSet<i32>>, Vec<Vec<i32>>)) -> i32 {
     let (ref rules, ref updates) = input;
-    updates.iter()
+    updates
+        .iter()
         .filter_map(|u| {
             let mut n_so_far = HashSet::<i32>::new();
-            return u.iter().any(|n| {
-                n_so_far.insert(*n);
-                rules.get(n).unwrap().intersection(&n_so_far).count() != 0
-            }).then(|| {
-                let mut ordered_u = u.clone();
+            u.iter()
+                .any(|n| {
+                    n_so_far.insert(*n);
+                    rules.get(n).unwrap().intersection(&n_so_far).count() != 0
+                })
+                .then(|| {
+                    let mut ordered_u = u.clone();
 
-                ordered_u.sort_unstable_by(|a,b|
-                    if *a == *b {
-                        std::cmp::Ordering::Equal
-                    } else if rules.get(a).unwrap().contains(b) {
-                        std::cmp::Ordering::Less
-                    } else {
-                        std::cmp::Ordering::Greater
-                    }
-                );
+                    ordered_u.sort_unstable_by(|a, b| {
+                        if *a == *b {
+                            std::cmp::Ordering::Equal
+                        } else if rules.get(a).unwrap().contains(b) {
+                            std::cmp::Ordering::Less
+                        } else {
+                            std::cmp::Ordering::Greater
+                        }
+                    });
 
-                ordered_u[u.len()/2]
-            })
-        }).sum()
+                    ordered_u[u.len() / 2]
+                })
+        })
+        .sum()
 }
 
 fn main() {
@@ -109,21 +119,21 @@ mod test {
     #[test]
     fn parsing() {
         let rules: HashMap<i32, HashSet<i32>> = HashMap::from([
-            (97, HashSet::from([13,61,47,29,53,75])),
-            (75, HashSet::from([29,53,47,61,13])),
-            (61, HashSet::from([13,53,29])),
+            (97, HashSet::from([13, 61, 47, 29, 53, 75])),
+            (75, HashSet::from([29, 53, 47, 61, 13])),
+            (61, HashSet::from([13, 53, 29])),
             (29, HashSet::from([13])),
-            (53, HashSet::from([29,13])),
-            (47, HashSet::from([53,13,61,29])),
+            (53, HashSet::from([29, 13])),
+            (47, HashSet::from([53, 13, 61, 29])),
             (13, HashSet::from([])),
         ]);
         let updates: Vec<Vec<i32>> = vec![
-            vec![75,47,61,53,29],
-            vec![97,61,53,29,13],
-            vec![75,29,13],
-            vec![75,97,47,61,53],
-            vec![61,13,29],
-            vec![97,13,75,29,47],
+            vec![75, 47, 61, 53, 29],
+            vec![97, 61, 53, 29, 13],
+            vec![75, 29, 13],
+            vec![75, 97, 47, 61, 53],
+            vec![61, 13, 29],
+            vec![97, 13, 75, 29, 47],
         ];
         assert_eq!((rules, updates), parse_input(TEST_INPUT));
     }

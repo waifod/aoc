@@ -1,14 +1,12 @@
 use regex::Regex;
 
-use utils;
-
 const INPUT_PATH: &str = "./input/input.txt";
 
 fn solve1(input: &str) -> usize {
     let re = Regex::new(r"mul\(([0-9]{1,3}),([0-9]{1,3})\)").unwrap();
     re.captures_iter(input)
         .map(|capture| capture.extract())
-        .map(|(_,[m1,m2])| m1.parse::<usize>().unwrap() * m2.parse::<usize>().unwrap())
+        .map(|(_, [m1, m2])| m1.parse::<usize>().unwrap() * m2.parse::<usize>().unwrap())
         .sum()
 }
 
@@ -27,10 +25,10 @@ fn solve2(input: &str) -> usize {
             }
             enabled
         })
-        .map(|capture|
-            capture.get(2).unwrap().as_str().parse::<usize>().unwrap() 
+        .map(|capture| {
+            capture.get(2).unwrap().as_str().parse::<usize>().unwrap()
                 * capture.get(3).unwrap().as_str().parse::<usize>().unwrap()
-        )
+        })
         .sum()
 }
 
