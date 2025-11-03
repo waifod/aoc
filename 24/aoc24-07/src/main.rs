@@ -16,52 +16,75 @@ fn parse_input(input: &str) -> Vec<(u64, Vec<u64>)> {
         .collect()
 }
 
-fn chain(mut prefix: u64, suffix: u64) -> u64 {
-    let mut tmp = suffix;
-    while tmp != 0 {
-        tmp /= 10;
-        prefix *= 10;
+fn unchain_rtl(target: u64, suffix: u64) -> Option<u64> {
+    if suffix > target {
+        return None;
     }
-    prefix + suffix
+    if suffix == 0 {
+        if target == 0 {
+            return Some(0);
+        }
+        return (target % 10 == 0).then_some(target / 10);
+    }
+
+    let num_digits = (suffix as f64).log10().floor() as u32 + 1;
+    let power = 10u64.pow(num_digits);
+
+    (target % power == suffix).then_some(target / power)
 }
 
-fn is_valid<Op>(values: &[u64], cur: u64, target: u64, ops: &[Op]) -> bool
+fn is_valid_rtl<Op>(values: &[u64], index: isize, target: u64, ops: &[Op]) -> bool
 where
-    Op: Fn(u64, u64) -> u64,
+    Op: Fn(u64, u64) -> Option<u64>,
 {
-    if cur > target {
-        return false;
+    if index < 0 {
+        return target == 0;
     }
-    if values.is_empty() {
-        return cur == target;
-    }
-    ops.iter()
-        .any(|op| is_valid(&values[1..], op(cur, values[0]), target, ops))
+
+    let val = values[index as usize];
+
+    ops.iter().any(|op| {
+        if let Some(next_target) = op(target, val) {
+            is_valid_rtl(values, index - 1, next_target, ops)
+        } else {
+            false
+        }
+    })
 }
 
-fn helper<Op>(input: &[(u64, Vec<u64>)], ops: &[Op]) -> u64
+fn helper_rtl<Op>(input: &[(u64, Vec<u64>)], ops: &[Op]) -> u64
 where
-    Op: Fn(u64, u64) -> u64,
+    Op: Fn(u64, u64) -> Option<u64>,
 {
     input
         .iter()
-        .filter_map(|(target, values)| is_valid(values, 0, *target, ops).then_some(target))
+        .filter_map(|(target, values)| {
+            is_valid_rtl(values, values.len() as isize - 1, *target, ops).then_some(target)
+        })
         .sum()
 }
 
 fn solve1(input: &[(u64, Vec<u64>)]) -> u64 {
-    let ops = [|a, b| a + b, |a, b| a * b];
-    helper(input, &ops)
+    let ops: [fn(u64, u64) -> Option<u64>; 2] = [
+        |t, v| t.checked_sub(v),
+        |t, v| (v != 0 && t % v == 0).then_some(t / v),
+    ];
+    helper_rtl(input, &ops)
 }
 
 fn solve2(input: &[(u64, Vec<u64>)]) -> u64 {
-    let ops = [|a, b| a + b, |a, b| a * b, chain];
-    helper(input, &ops)
+    let ops: [fn(u64, u64) -> Option<u64>; 3] = [
+        |t, v| t.checked_sub(v),
+        |t, v| (v != 0 && t % v == 0).then_some(t / v),
+        unchain_rtl,
+    ];
+    helper_rtl(input, &ops)
 }
 
 fn main() {
     println!("Solving AoC24, day 7...");
-    let input = parse_input(&utils::get_input(INPUT_PATH));
+    let input_str = utils::get_input(INPUT_PATH);
+    let input = parse_input(&input_str);
     println!("Part 1: {}", solve1(&input));
     println!("Part 2: {}", solve2(&input));
 }
